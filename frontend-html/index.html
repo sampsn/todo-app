@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple Todo App</title>
+  </head>
+
+  <body>
+    <p>Hello</p>
+
+    <form id="myForm">
+      <label for="number">Number:</label>
+      <input type="number" id="number" name="number" /><br /><br />
+      <label for="description">Description:</label>
+      <input type="text" id="description" name="description" /><br /><br />
+      <input type="button" id="submitBtn" value="Submit" />
+    </form>
+
+    <pre id="jsonDataDisplay"></pre>
+
+    <button id="getInfoBtn">Visit Get Info</button>
+
+    <script>
+      document
+        .getElementById("submitBtn")
+        .addEventListener("click", function () {
+          var form = document.getElementById("myForm");
+          var formData = new FormData(form);
+          var object = {};
+          formData.forEach((value, key) => (object[key] = value));
+          var jsonData = JSON.stringify(object);
+
+          document.getElementById("jsonDataDisplay").textContent = jsonData;
+
+          fetch("http://localhost:8000/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: jsonData,
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(
+                  "Network response was not ok " + response.statusText,
+                );
+              }
+              return response.json();
+            })
+            .then((data) => {
+              console.log("Success:", data);
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
+        });
+
+      document
+        .getElementById("getInfoBtn")
+        .addEventListener("click", function () {
+          fetch("http://localhost:8000/")
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(
+                  "Network response was not ok " + response.statusText,
+                );
+              }
+              return response.json();
+            })
+            .then((data) => {
+              document.getElementById("jsonDataDisplay").textContent =
+                JSON.stringify(data, null, 2);
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
+        });
+    </script>
+  </body>
+</html>
